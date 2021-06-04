@@ -83,3 +83,6 @@ if crossUnderCondition
     formerCross := 2.0
 
 ```
+
+效果图
+![](image/90sma-confirm.png)
