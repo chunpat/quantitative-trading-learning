@@ -2,8 +2,8 @@
 
 * [Introduction](README.md)
 * [learning-record](part1/README.md)
-    * [公用类](learning-record/midClass.ipynb)
-* [tv指标](tradingview/rsi.md)
+    * [common class](learning-record/midClass.ipynb)
+* [tradingview indicators](tradingview/rsi.md)
     * [RSI 背离信号](tradingview/rsi.md)
 * [strategy](strategy/README.md)
     * [均仓](strategy/averageBalance.ipynb)
@@ -12,7 +12,7 @@
     * [破线确认]](strategy/tradingview-99sma-1.md)
 * [笔记](note/README.md)
     * [基础-1](note/basis-1.md)
-    * [基础-2](note/basis-1.md)
+    * [基础-2](note/basis-2.md)
     * [指标](note/indicators.md)
 
 ## 参考
