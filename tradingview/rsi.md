@@ -5,7 +5,7 @@
 // © zhangzhenpeng008
 
 //@version=4
-study(title = "RSI 背离" , overlay=false)
+study(title = "RSI 背离" , overlay=false) // 指标命名，overlay=false为开小图
 
 len = input(title='RSI Reriod' ,minval = 1 ,defval=21)
 src = input(title='RSI Source' , defval=close)
@@ -47,7 +47,7 @@ oscHL = osc[lbR] > valuewhen(plFound,osc[lbR],1) and _inRange(plFound[1])
 
 priceLL = low[lbR] < valuewhen(plFound,low[lbR],1)
 
-bullCond = plotBull and priceLL and oscHL and plFound
+bullCond = plotBull and priceLL and oscHL and plFound // 满足多条件
 
 plot(
      plFound ? osc[lbR] : na,
