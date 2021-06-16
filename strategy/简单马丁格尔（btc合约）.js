@@ -1,3 +1,4 @@
+
 /*
 本策略仅供学习使用，用于实盘后果自负 
 */
@@ -13,9 +14,34 @@ function getRandom(m, n) {　　
     return num;
 }
 
+//下单量
+// function orderAmount(amount) {　　
+//     return n;
+// }
+
+function orderAmount(amount) {　　
+    return n;
+}
+
 function main() {
     exchange.SetContractType("swap")  // 永续u合约
     exchange.SetMarginLevel(MarginLevel) // 设置杠杆
+
+    var account = exchange.GetAccount()
+    Log("账户信息，Balance:", account.Balance, "FrozenBalance:", account.FrozenBalance, "Stocks:",
+    account.Stocks, "FrozenStocks:", account.FrozenStocks)
+
+    var orderMoney = account.Balance * n // 下单金额 
+
+    var ticker = exchange.GetTicker()
+    /*
+        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是可能API接口访问不通）
+        此时ticker为null，当访问ticker.High时，会导致错误，所以测试时，确保可以访问到交易所接口
+    */
+    Log("High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Volume:", ticker.Volume)
+   
+
+
     var position = []
     while (true) {
         // {
@@ -34,20 +60,22 @@ function main() {
         //     PD_LONG_YD	昨日多头仓位	CTP用exchange.SetDirection("closebuy")设置平仓方向	商品期货	2
         //     PD_SHORT_YD	昨日空头仓位	CTP用exchange.SetDirection("closesell")设置平仓方向	商品期货	3
         position = exchange.GetPosition()  //获取当前持仓
-
+        var ticker = exchange.GetTicker()
+        var tickerLast = ticker.Last
+        var orderAmount = orderMoney / tickerLast  // 每次都计算该下多少数量
         //未持仓
-        if (position.length == 0) { 
+        if (position.length == 0) {
             //取随机数0、1作为方向
             var random = getRandom(2, 0)
             Log(random)
             if (random == 0) {
                 exchange.SetDirection("sell")
                 // -1: 下市价单买入，买入0.1个BTC（计价币）金额的ETH币;  n: 数字货币期货市价单方式下单，下单量参数的单位为合约张数;
-                exchange.Sell(-1, n, "开空")
+                exchange.Sell(-1, orderAmount, '现价: ' + tickerLast + ",开空")
             }
             if (random == 1) {
                 exchange.SetDirection("buy")
-                exchange.Buy(-1, n, "开多")
+                exchange.Buy(-1, orderAmount, '现价: ' + tickerLast + ",开多")
             }
 
         }
@@ -60,15 +88,15 @@ function main() {
                 if (position[0].Profit > profit) {
                     exchange.SetDirection("closebuy")
                     //市价卖
-                    Log('position',position)
-                    exchange.Sell(-1, position[0].Amount,'平多获利,获利量' + position[0].Amount)
+           
+                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',平多获利,平量:' + position[0].Amount + ',获利u:' + position[0].Profit)
                 }
                 //负盈利大于保证金 则加仓
                 if (position[0].Profit < position[0].Margin * -1) {
                     exchange.SetDirection("buy")
                     //加仓
-                    Log('position',position)
-                    exchange.Buy(-1, position[0].Amount, '开多加仓买入，买入量' + position[0].Amount)
+                 
+                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',开多加仓买入，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast)
                 }
             }
 
@@ -76,18 +104,17 @@ function main() {
             if (position[0].Type == 1) {
                 if (position[0].Profit > profit) {
                     exchange.SetDirection("closesell")
-                    Log('position',position)
-                    exchange.Buy(-1, position[0].Amount, '平空获利,获利量' + position[0].Amount)
+                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',平空获利,平量' + position[0].Amount + ',获利u:' + position[0].Profit)
                 }
                 if (position[0].Profit < position[0].Margin * -1) {
                     exchange.SetDirection("sell")
-                    Log('position',position)
-                    exchange.Sell(-1, position[0].Amount, '开空加仓卖出，卖出量' + position[0].Amount)
+                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',开空加仓卖出，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast)
                 }
             }
             //休眠一分钟
             Sleep(60000)
         }
     }
+
 
 }
