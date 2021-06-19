@@ -1,12 +1,9 @@
-// fmz@00b4de29d25d38140e35015785d08e95
 /*
 本策略仅供学习使用，用于实盘后果自负 
 */
-
-var n = 0.05 //初始下单数
+var n = 0.1 //初始下单数
 var MarginLevel = 100 //合约杠杆 
 var profit = 20 //期望收益 ，不能小于手续费 
-
 
 //取随机数 
 function getRandom(m, n) {　　
@@ -39,8 +36,6 @@ function main() {
         此时ticker为null，当访问ticker.High时，会导致错误，所以测试时，确保可以访问到交易所接口
     */
     Log("High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Volume:", ticker.Volume)
-   
-
 
     var position = []
     while (true) {
@@ -74,11 +69,11 @@ function main() {
                 exchange.SetDirection("sell")
                 // -1: 下市价单买入，买入0.1个BTC（计价币）金额的ETH币;  n: 数字货币期货市价单方式下单，下单量参数的单位为合约张数;
                 //币安这里为币的量
-                exchange.Sell(-1, orderAmount, '现价: ' + tickerLast + ",开空" + '，账号余额：' + account.Balance + '余额冻结：')
+                exchange.Sell(-1, orderAmount , '现价: ' + tickerLast + ",开空" + '，账号余额：' + account.Balance + '余额冻结：' + account.Balance)
             }
             if (random == 1) {
                 exchange.SetDirection("buy")
-                exchange.Buy(-1, orderAmount, '现价: ' + tickerLast + ",开多"+ '，账号余额：' + account.Balance + '余额冻结：')
+                exchange.Buy(-1, orderAmount, '现价: ' + tickerLast + ",开多"+ '，账号余额：' + account.Balance + '余额冻结：' + account.Balance)
             }
 
         }
@@ -92,14 +87,14 @@ function main() {
                     exchange.SetDirection("closebuy")
                     //市价卖
            
-                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',平多获利,平量:' + position[0].Amount + ',获利u:' + position[0].Profit  + '，账号余额：' + account.Balance + '余额冻结：')
+                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',平多获利,平量:' + position[0].Amount + ',获利u:' + position[0].Profit  + '，账号余额：' + account.Balance + '余额冻结：' + account.FrozenBalance)
                 }
                 //负盈利大于保证金 则加仓
                 if (position[0].Profit < position[0].Margin * -1) {
                     exchange.SetDirection("buy")
                     //加仓
                  
-                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',开多加仓买入，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast  + '，账号余额：' + account.Balance + '余额冻结：')
+                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',开多加仓买入，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast  + '，账号余额：' + account.Balance + '余额冻结：' + account.FrozenBalance)
                 }
             }
 
@@ -107,11 +102,11 @@ function main() {
             if (position[0].Type == 1) {
                 if (position[0].Profit > profit) {
                     exchange.SetDirection("closesell")
-                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',平空获利,平量' + position[0].Amount + ',获利u:' + position[0].Profit  + '，账号余额：' + account.Balance + '余额冻结：')
+                    exchange.Buy(-1, position[0].Amount, '现价: ' + tickerLast + ',平空获利,平量' + position[0].Amount + ',获利u:' + position[0].Profit  + '，账号余额：' + account.Balance + '余额冻结：' + account.FrozenBalance)
                 }
                 if (position[0].Profit < position[0].Margin * -1) {
                     exchange.SetDirection("sell")
-                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',开空加仓卖出，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast  + '，账号余额：' + account.Balance + '余额冻结：')
+                    exchange.Sell(-1, position[0].Amount,'现价: ' + tickerLast + ',开空加仓卖出，加仓量' + position[0].Amount + ',加仓u:' + position[0].Amount * tickerLast  + '，账号余额：' + account.Balance + '余额冻结：' + account.FrozenBalance)
                 }
             }
             //休眠一分钟
